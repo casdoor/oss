@@ -47,8 +47,6 @@ func (client Client) ToRelativePath(urlPath string) string {
 	return strings.TrimPrefix(urlPath, "/")
 }
 
-const blobFormatString = `https://%s.blob.core.windows.net`
-
 var (
 	ctx = context.Background() // This uses a never-expiring context.
 )
@@ -77,7 +75,7 @@ func GetBlobService(config *Config) (azblob.ServiceURL, error) {
 
 	// From the Azure portal, get your Storage account blob service URL endpoint.
 	// The URL typically looks like this:
-	u, _ := url.Parse(fmt.Sprintf(blobFormatString, config.AccessID))
+	u, _ := url.Parse(fmt.Sprintf(`https://%s.blob.core.windows.net`, config.AccessID))
 
 	// Create an ServiceURL object that wraps the service URL and a request pipeline.
 	return azblob.NewServiceURL(*u, p), nil
@@ -95,7 +93,7 @@ func (client Client) UploadBlob(blobName *string, blobType *string, data io.Read
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Upload the blob
-	_, err := blobURL.Upload(ctx, data, azblob.BlobHTTPHeaders{ContentType: *blobType}, azblob.Metadata{}, azblob.BlobAccessConditions{}, azblob.DefaultAccessTier, nil, azblob.ClientProvidedKeyOptions{})
+	_, err := blobURL.Upload(ctx, data, azblob.BlobHTTPHeaders{ContentType: *blobType}, azblob.Metadata{}, azblob.BlobAccessConditions{}, azblob.DefaultAccessTier, nil, azblob.ClientProvidedKeyOptions{}, azblob.ImmutabilityPolicyOptions{})
 	if err != nil {
 		return azblob.BlockBlobURL{}, err
 	}
@@ -205,7 +203,7 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 		return nil, err
 	}
 	now := time.Now()
-
+	urlPath = fmt.Sprintf("%s/%s", client.Config.Bucket, urlPath)
 	return &oss.Object{
 		Path:             urlPath,
 		Name:             filepath.Base(urlPath),
