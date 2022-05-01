@@ -1,19 +1,19 @@
 package tencent
 
 import (
-	"os"
+	"bytes"
+	"errors"
+	"fmt"
 	"github.com/qor/oss"
 	"io"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path/filepath"
-	"time"
-	"errors"
-	"strings"
-	"bytes"
-	"regexp"
 	"net/url"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
 )
 
 var _ oss.StorageInterface = (*Client)(nil)
@@ -73,7 +73,7 @@ func (client Client) GetStream(path string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil,errors.New("get file fail")
+		return nil, errors.New("get file fail")
 	}
 	return resp.Body, nil
 }

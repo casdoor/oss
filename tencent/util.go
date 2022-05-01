@@ -1,15 +1,15 @@
 package tencent
 
 import (
+	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/hex"
-	"crypto/hmac"
-	"net/http"
-	"strings"
-	"sort"
-	"time"
 	"fmt"
+	"net/http"
 	"net/url"
+	"sort"
+	"strings"
+	"time"
 )
 
 func sha(s string) string {

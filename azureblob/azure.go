@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/qor/oss"
+
 	"io"
 	"io/ioutil"
 	"mime"
@@ -18,6 +17,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/Azure/azure-storage-blob-go/azblob"
+	"github.com/qor/oss"
 )
 
 // Client azure blob storage
@@ -27,7 +29,7 @@ type Client struct {
 }
 
 type Config struct {
-	AccessID  string //Account Name
+	AccessId  string //Account Name
 	AccessKey string //Access Keys
 	Region    string
 	Bucket    string //Container Name
@@ -54,18 +56,16 @@ var (
 )
 
 func New(config *Config) *Client {
-
 	var client = &Client{Config: config}
 
 	serviceURL, _ := GetBlobService(config)
-	client.containerURL = containerURL(serviceURL, config)
+	client.containerURL = containerUrl(serviceURL, config)
 	return client
 }
 
 func GetBlobService(config *Config) (azblob.ServiceURL, error) {
-
 	// Use your Storage account's name and key to create a credential object; this is used to access your account.
-	credential, err := azblob.NewSharedKeyCredential(config.AccessID, config.AccessKey)
+	credential, err := azblob.NewSharedKeyCredential(config.AccessId, config.AccessKey)
 	if err != nil {
 		return azblob.ServiceURL{}, err
 	}
@@ -77,13 +77,13 @@ func GetBlobService(config *Config) (azblob.ServiceURL, error) {
 
 	// From the Azure portal, get your Storage account blob service URL endpoint.
 	// The URL typically looks like this:
-	u, _ := url.Parse(fmt.Sprintf(blobFormatString, config.AccessID))
+	u, _ := url.Parse(fmt.Sprintf(blobFormatString, config.AccessId))
 
 	// Create an ServiceURL object that wraps the service URL and a request pipeline.
 	return azblob.NewServiceURL(*u, p), nil
 }
 
-func containerURL(serviceURL azblob.ServiceURL, config *Config) *azblob.ContainerURL {
+func containerUrl(serviceURL azblob.ServiceURL, config *Config) *azblob.ContainerURL {
 	// This returns a ContainerURL object that wraps the container's URL and a request pipeline (inherited from serviceURL)
 	container := serviceURL.NewContainerURL(config.Bucket)
 	return &container
@@ -91,7 +91,7 @@ func containerURL(serviceURL azblob.ServiceURL, config *Config) *azblob.Containe
 
 func (client Client) UploadBlob(blobName *string, blobType *string, data io.ReadSeeker) (azblob.BlockBlobURL, error) {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Upload the blob
@@ -105,7 +105,7 @@ func (client Client) UploadBlob(blobName *string, blobType *string, data io.Read
 
 func (client Client) DownloadBlob(blobName *string) (*azblob.DownloadResponse, error) {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Download the blob's contents and verify that it worked correctly
@@ -114,7 +114,7 @@ func (client Client) DownloadBlob(blobName *string) (*azblob.DownloadResponse, e
 
 func (client Client) DeleteBlob(blobName *string) error {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Delete the blob
@@ -233,5 +233,4 @@ func (client Client) GetEndpoint() string {
 		return client.Config.Endpoint
 	}
 	return client.containerURL.String()
-
 }

@@ -48,7 +48,7 @@ func TestToRelativePath(t *testing.T) {
 		"https://qor-example.com/myobject.ext":           "/myobject.ext",
 		"//mybucket.s3.amazonaws.com/myobject.ext":       "/myobject.ext",
 		"http://mybucket.s3.amazonaws.com/myobject.ext":  "/myobject.ext",
-		"myobject.ext":                                   "/myobject.ext",
+		"myobject.ext": "/myobject.ext",
 	}
 
 	for url, path := range urlMap {
