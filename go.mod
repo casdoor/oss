@@ -1,4 +1,4 @@
-module github.com/leo220yuyaodog/ossgit
+module github.com/leo220yuyaodog/oss
 
 go 1.17
 
