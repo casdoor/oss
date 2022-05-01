@@ -16,7 +16,7 @@ func TestClient_Get(t *testing.T) {
 var client *Client
 
 func init() {
-	client, _ = New(&Config{
+	client = New(&Config{
 		AccessID:  "AKIDToxukQWBG8nGXcBN8i662nOo12sc5Wjl",
 		AccessKey: "40jNrBf5mLiuuiU8HH7lDTXP5at00sbA",
 		Bucket:    "tets-1252882253",

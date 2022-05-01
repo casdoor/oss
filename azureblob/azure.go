@@ -150,6 +150,7 @@ func (client Client) GetListBlob() ([][]azblob.BlobItemInternal, error) {
 }
 
 func (client Client) Get(path string) (file *os.File, err error) {
+	path = client.ToRelativePath(path)
 	readCloser, err := client.GetStream(path)
 
 	if err == nil {
@@ -213,6 +214,7 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 }
 
 func (client Client) Delete(path string) error {
+	path = client.ToRelativePath(path)
 	return client.DeleteBlob(&path)
 }
 
