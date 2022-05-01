@@ -238,7 +238,7 @@ func (client Client) List(path string) ([]*oss.Object, error) {
 	panic("implement me")
 }
 
-func (client Client) GetURL(path string) (string, error) {
+func (client Client) GetUrl(path string) (string, error) {
 	return path, nil
 }
 
