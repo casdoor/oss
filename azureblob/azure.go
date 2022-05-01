@@ -1,11 +1,24 @@
+// Copyright 2021 The Casdoor Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package azureblob
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/qor/oss"
+
 	"io"
 	"io/ioutil"
 	"mime"
@@ -18,6 +31,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/Azure/azure-storage-blob-go/azblob"
+	"github.com/qor/oss"
 )
 
 // Client azure blob storage
@@ -27,7 +43,7 @@ type Client struct {
 }
 
 type Config struct {
-	AccessID  string //Account Name
+	AccessId  string //Account Name
 	AccessKey string //Access Keys
 	Region    string
 	Bucket    string //Container Name
@@ -47,23 +63,23 @@ func (client Client) ToRelativePath(urlPath string) string {
 	return strings.TrimPrefix(urlPath, "/")
 }
 
+const blobFormatString = `https://%s.blob.core.windows.net`
+
 var (
 	ctx = context.Background() // This uses a never-expiring context.
 )
 
 func New(config *Config) *Client {
-
 	var client = &Client{Config: config}
 
 	serviceURL, _ := GetBlobService(config)
-	client.containerURL = containerURL(serviceURL, config)
+	client.containerURL = containerUrl(serviceURL, config)
 	return client
 }
 
 func GetBlobService(config *Config) (azblob.ServiceURL, error) {
-
 	// Use your Storage account's name and key to create a credential object; this is used to access your account.
-	credential, err := azblob.NewSharedKeyCredential(config.AccessID, config.AccessKey)
+	credential, err := azblob.NewSharedKeyCredential(config.AccessId, config.AccessKey)
 	if err != nil {
 		return azblob.ServiceURL{}, err
 	}
@@ -75,13 +91,13 @@ func GetBlobService(config *Config) (azblob.ServiceURL, error) {
 
 	// From the Azure portal, get your Storage account blob service URL endpoint.
 	// The URL typically looks like this:
-	u, _ := url.Parse(fmt.Sprintf(`https://%s.blob.core.windows.net`, config.AccessID))
+	u, _ := url.Parse(fmt.Sprintf(blobFormatString, config.AccessId))
 
 	// Create an ServiceURL object that wraps the service URL and a request pipeline.
 	return azblob.NewServiceURL(*u, p), nil
 }
 
-func containerURL(serviceURL azblob.ServiceURL, config *Config) *azblob.ContainerURL {
+func containerUrl(serviceURL azblob.ServiceURL, config *Config) *azblob.ContainerURL {
 	// This returns a ContainerURL object that wraps the container's URL and a request pipeline (inherited from serviceURL)
 	container := serviceURL.NewContainerURL(config.Bucket)
 	return &container
@@ -89,7 +105,7 @@ func containerURL(serviceURL azblob.ServiceURL, config *Config) *azblob.Containe
 
 func (client Client) UploadBlob(blobName *string, blobType *string, data io.ReadSeeker) (azblob.BlockBlobURL, error) {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Upload the blob
@@ -103,7 +119,7 @@ func (client Client) UploadBlob(blobName *string, blobType *string, data io.Read
 
 func (client Client) DownloadBlob(blobName *string) (*azblob.DownloadResponse, error) {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Download the blob's contents and verify that it worked correctly
@@ -112,7 +128,7 @@ func (client Client) DownloadBlob(blobName *string) (*azblob.DownloadResponse, e
 
 func (client Client) DeleteBlob(blobName *string) error {
 	// Create a URL that references a to-be-created blob in your Azure Storage account's container.
-	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerURL)
+	// This returns a BlockBlobURL object that wraps the blob's URL and a request pipeline (inherited from containerUrl)
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Delete the blob
@@ -204,7 +220,7 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 		return nil, err
 	}
 	now := time.Now()
-	urlPath = fmt.Sprintf("%s/%s", client.Config.Bucket, urlPath)
+
 	return &oss.Object{
 		Path:             urlPath,
 		Name:             filepath.Base(urlPath),
@@ -231,5 +247,4 @@ func (client Client) GetEndpoint() string {
 		return client.Config.Endpoint
 	}
 	return client.containerURL.String()
-
 }
