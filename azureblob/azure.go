@@ -95,7 +95,7 @@ func (client Client) UploadBlob(blobName *string, blobType *string, data io.Read
 	blobURL := client.containerURL.NewBlockBlobURL(*blobName) // Blob names can be mixed case
 
 	// Upload the blob
-	_, err := blobURL.Upload(ctx, data, azblob.BlobHTTPHeaders{ContentType: *blobType}, azblob.Metadata{}, azblob.BlobAccessConditions{}, azblob.DefaultAccessTier, nil, azblob.ClientProvidedKeyOptions{})
+	_, err := blobURL.Upload(ctx, data, azblob.BlobHTTPHeaders{ContentType: *blobType}, azblob.Metadata{}, azblob.BlobAccessConditions{}, azblob.DefaultAccessTier, nil, azblob.ClientProvidedKeyOptions{}, azblob.ImmutabilityPolicyOptions{})
 	if err != nil {
 		return azblob.BlockBlobURL{}, err
 	}
@@ -152,6 +152,7 @@ func (client Client) GetListBlob() ([][]azblob.BlobItemInternal, error) {
 }
 
 func (client Client) Get(path string) (file *os.File, err error) {
+	path = client.ToRelativePath(path)
 	readCloser, err := client.GetStream(path)
 
 	if err == nil {
@@ -215,6 +216,7 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 }
 
 func (client Client) Delete(path string) error {
+	path = client.ToRelativePath(path)
 	return client.DeleteBlob(&path)
 }
 
