@@ -23,4 +23,5 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
+	github.com/qiniu/go-sdk/v7 v7.12.1
 )
