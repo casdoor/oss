@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/configor"
-	//"github.com/qor/oss/qiniu"
+	"github.com/qor/oss/qiniu"
 	"github.com/qor/oss/tests"
 )
 

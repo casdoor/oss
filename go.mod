@@ -8,6 +8,8 @@ require (
 	github.com/aws/aws-sdk-go v1.44.4
 	github.com/jinzhu/configor v1.2.1
 	github.com/qor/oss v0.0.0-20210412121326-3c5583a62015
+	github.com/qiniu/go-sdk/v7 v7.12.1
+
 )
 
 require (
