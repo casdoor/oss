@@ -1,2 +1,7 @@
 test_env
 
+.idea
+*.iws
+*.iml
+*.ipr
+*.xml
