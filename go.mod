@@ -1,4 +1,4 @@
-module github.com/leo220yuyaodog/oss
+module github.com/casdoor/oss
 
 go 1.18
 
