@@ -6,21 +6,7 @@ on:
 
 jobs:
 
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.15
-
-      - uses: actions/checkout@v2
-      - name: Run Unit tests
-        run: go test -v ./...
-
   semantic-release:
-    needs: [test]
     runs-on: ubuntu-latest
     steps:
 
