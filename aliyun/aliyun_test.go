@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	aliyunoss "github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/casdoor/oss/aliyun"
+	"github.com/casdoor/oss/tests"
 	"github.com/jinzhu/configor"
-	"github.com/qor/oss/aliyun"
-	"github.com/qor/oss/tests"
 )
 
 type Config struct {

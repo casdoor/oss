@@ -33,7 +33,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/qor/oss"
+	"github.com/casdoor/oss"
 )
 
 // Client azure blob storage

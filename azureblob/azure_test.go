@@ -20,7 +20,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/qor/oss/tests"
+	"github.com/casdoor/oss/tests"
 )
 
 var client *Client
