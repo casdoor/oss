@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	awss3 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/casdoor/oss/s3"
+	"github.com/casdoor/oss/tests"
 	"github.com/jinzhu/configor"
-	"github.com/qor/oss/s3"
-	"github.com/qor/oss/tests"
 )
 
 type Config struct {
@@ -48,7 +48,7 @@ func TestToRelativePath(t *testing.T) {
 		"https://qor-example.com/myobject.ext":           "/myobject.ext",
 		"//mybucket.s3.amazonaws.com/myobject.ext":       "/myobject.ext",
 		"http://mybucket.s3.amazonaws.com/myobject.ext":  "/myobject.ext",
-		"myobject.ext":                                   "/myobject.ext",
+		"myobject.ext": "/myobject.ext",
 	}
 
 	for url, path := range urlMap {
