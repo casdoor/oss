@@ -22,6 +22,7 @@ type Object struct {
 	Path             string
 	Name             string
 	LastModified     *time.Time
+	Size             int64
 	StorageInterface StorageInterface
 }
 

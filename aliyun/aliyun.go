@@ -118,6 +118,7 @@ func (client Client) List(path string) ([]*oss.Object, error) {
 				Path:             "/" + client.ToRelativePath(obj.Key),
 				Name:             filepath.Base(obj.Key),
 				LastModified:     &obj.LastModified,
+				Size:             obj.Size,
 				StorageInterface: client,
 			})
 		}
