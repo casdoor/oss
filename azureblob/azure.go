@@ -246,5 +246,5 @@ func (client Client) GetEndpoint() string {
 	if client.Config.Endpoint != "" {
 		return client.Config.Endpoint
 	}
-	return client.containerURL.String()
+	return fmt.Sprintf(blobFormatString, client.Config.AccessId)
 }
