@@ -1,10 +1,50 @@
 # OSS
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/casdoor/oss)](https://goreportcard.com/report/github.com/casdoor/oss)
+[![Go](https://github.com/casdoor/oss/actions/workflows/ci.yml/badge.svg)](https://github.com/casdoor/oss/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/casdoor/oss.svg)](https://pkg.go.dev/github.com/casdoor/oss)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/casdoor/oss)
+
 QOR OSS aims to provide a common interface to operate files with any kinds of storages, like cloud storages, FTP, file system etc
+
+- [Aliyun](https://www.alibabacloud.com/)
+- [Amazon SNS](https://azure.microsoft.com/)
+- [Google Cloud](https://console.cloud.google.com/)
+- [Qi Niu](https://www.qiniu.com/)
+- [AWS S3](https://aws.amazon.com/s3/)
+- [Tencent](https://cloud.tencent.com/)
+- [File System]()
 
 # Usage
 
-Currently, QOR OSS provides support for file system, S3, Aliyun and Qiniu., You can easily implement your own storage strategies by implementing the interface.
+## Installation
+
+Use `go get` to install：
+
+```
+go get github.com/casdoor/oss
+```
+
+## Create Client
+
+Different oss providers need to provide different configuration, but we support a unit API as below to create the oss client.
+
+```go
+func New(config *Config) (*Client, error)
+```
+
+The config generally includes the following information:
+
+- `AccessID`: The access ID for authentication.
+- `AccessKey`: The access key for authentication.
+- `Bucket`: The name of the bucket where the data is stored.
+- `Endpoint`: The endpoint for accessing the storage service.
+
+Please note that the actual configuration may vary depending on the specific storage service being used.
+
+## Operation
+
+Currently, QOR OSS provides support for file system, S3, Aliyun and so on, You can easily implement your own storage strategies by implementing the interface.
 
 ```go
 type StorageInterface interface {
@@ -17,6 +57,8 @@ type StorageInterface interface {
   GetURL(path string) (string, error)
 }
 ```
+
+## Example
 
 Here's an example of how to use [QOR OSS](https://github.com/qor/oss) with S3. After initializing the s3 storage, The functions in the interface are available.
 
@@ -51,6 +93,6 @@ func main() {
 }
 ```
 
-## License
+# License
 
 Released under the [MIT License](http://opensource.org/licenses/MIT).
