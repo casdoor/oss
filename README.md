@@ -5,15 +5,16 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/casdoor/oss.svg)](https://pkg.go.dev/github.com/casdoor/oss)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/casdoor/oss)
 
-QOR OSS aims to provide a common interface to operate files with any kinds of storages, like cloud storages, FTP, file system etc
+Casdoor OSS aims to provide a common interface to operate files with any kinds of storages, like cloud storages, FTP, file system etc
 
-- [Aliyun](https://www.alibabacloud.com/)
-- [Amazon SNS](https://azure.microsoft.com/)
-- [Google Cloud](https://console.cloud.google.com/)
-- [Qi Niu](https://www.qiniu.com/)
-- [AWS S3](https://aws.amazon.com/s3/)
-- [Tencent](https://cloud.tencent.com/)
-- [File System]()
+- [Local File System](https://github.com/casdoor/oss/tree/master/filesystem)
+- [MinIO (Open Source)](https://min.io)
+- [AWS S3](https://aws.amazon.com/s3)
+- [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)
+- [Google Cloud - Cloud Storage](https://cloud.google.com/storage)
+- [Alibaba Cloud OSS & CDN](https://cn.aliyun.com/product/oss)
+- [Tencent Cloud COS](https://cloud.tencent.com/product/cos)
+- [Qiniu Cloud Kodo](https://www.qiniu.com/products/kodo)
 
 # Usage
 
