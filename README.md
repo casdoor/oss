@@ -15,6 +15,7 @@ Casdoor OSS aims to provide a common interface to operate files with any kinds o
 - [Alibaba Cloud OSS & CDN](https://cn.aliyun.com/product/oss)
 - [Tencent Cloud COS](https://cloud.tencent.com/product/cos)
 - [Qiniu Cloud Kodo](https://www.qiniu.com/products/kodo)
+- [Cloudflare R2](https://developers.cloudflare.com/r2/)
 
 # Usage
 
