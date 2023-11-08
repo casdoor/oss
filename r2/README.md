@@ -13,8 +13,7 @@ func main() {
         AccessKeyId:      "Cloudflare R2 AccessKeyId",
         AccessKeySecret:  "Cloudflare R2 AccessKeySecret",
         Bucket:          "Cloudflare R2 Bucket",
-        Endpoint:        "Cloudflare R2 Endpoint",
-  })
+        Endpoint:        "https://{AccountId}.r2.cloudflarestorage.com",
 
   // Save a reader interface into storage
   storage.Put("/sample.txt", reader)
