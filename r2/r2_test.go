@@ -9,11 +9,11 @@ import (
 )
 
 type Config struct {
-	AccountId       string `env:"CREAPLUS_CF_R2_Account_ID"`
-	AccessKeyId     string `env:"CREAPLUS_CF_R2_ACCESS_KEY_ID"`
-	AccessKeySecret string `env:"CREAPLUS_CF_R2_ACCESS_KEY_SECRET"`
-	Bucket          string `env:"CREAPLUS_CF_R2_BUCKET"`
-	Endpoint        string `env:"CREAPLUS_CF_R2_ENDPOINT"`
+	AccountId       string `env:"CF_R2_Account_ID"`
+	AccessKeyId     string `env:"CF_R2_ACCESS_KEY_ID"`
+	AccessKeySecret string `env:"CF_R2_ACCESS_KEY_SECRET"`
+	Bucket          string `env:"CF_R2_BUCKET"`
+	Endpoint        string `env:"CF_R2_ENDPOINT"`
 }
 
 var (

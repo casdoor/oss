@@ -5,7 +5,7 @@
 ## Usage
 
 ```go
-import "https://github.com/creaplus/oss"
+import "https://github.com/cassdor/oss"
 
 func main() {
   storage := r2.New(&r2.Config{{
