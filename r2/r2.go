@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,16 +28,17 @@ type Client struct {
 }
 
 type Config struct {
-	AccessID        string
+	AccountId       string
 	AccessKeyId     string
 	AccessKeySecret string
 	Bucket          string
 	Endpoint        string
 }
 
+// New init cloudflare r2 store
 func New(config *Config) *Client {
 
-	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", config.AccessID)
+	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", config.AccountId)
 	config.Endpoint = endpoint
 
 	client := &Client{Config: config}
@@ -57,7 +59,7 @@ func New(config *Config) *Client {
 	return client
 }
 
-// Get(path string) (*os.File, error)
+// Get file with path
 func (client Client) Get(path string) (file *os.File, err error) {
 	stream, err := client.GetStream(path)
 	if err != nil {
@@ -78,11 +80,11 @@ func (client Client) Get(path string) (file *os.File, err error) {
 	return file, err
 }
 
-// GetStream(path string) (io.ReadCloser, error)
+// GetStream Get object as io.ReadCloser
 func (client Client) GetStream(path string) (io.ReadCloser, error) {
 	params := &s3.GetObjectInput{
 		Bucket: aws.String(client.Config.Bucket),
-		Key:    &path,
+		Key:    aws.String(client.ToRelativePath(path)),
 	}
 	object, err := client.R2.GetObject(context.TODO(), params)
 	if err != nil {
@@ -91,7 +93,7 @@ func (client Client) GetStream(path string) (io.ReadCloser, error) {
 	return object.Body, nil
 }
 
-// Put(path string, reader io.Reader) (*oss.Object, error)
+// Put Save a reader interface into storage
 func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) {
 	if seeker, ok := reader.(io.ReadSeeker); ok {
 		seeker.Seek(0, 0)
@@ -124,11 +126,11 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 	}, err
 }
 
-// Delete(path string) error
+// Delete file with path
 func (client Client) Delete(path string) error {
 	params := &s3.DeleteObjectInput{
 		Bucket: aws.String(client.Config.Bucket),
-		Key:    &path,
+		Key:    aws.String(client.ToRelativePath(path)),
 	}
 
 	_, err := client.R2.DeleteObject(context.TODO(), params)
@@ -138,13 +140,13 @@ func (client Client) Delete(path string) error {
 	return nil
 }
 
-// List(path string) ([]*ossObject, error)
+// List all objects under path
 func (client Client) List(path string) ([]*oss.Object, error) {
 	var objects []*oss.Object
 	var prefix string
 
 	if path != "" {
-		prefix = strings.Trim(path, "/") + "/"
+		prefix = client.ToRelativePath(path)
 	}
 
 	params := &s3.ListObjectsV2Input{
@@ -166,20 +168,21 @@ func (client Client) List(path string) ([]*oss.Object, error) {
 	return objects, err
 }
 
-// GetURL(path string) (string, error)
+// GetURL Public Accessible URL (useful if current file saved privately)
 func (client Client) GetURL(path string) (string, error) {
 	presignClient := s3.NewPresignClient(client.R2)
 	presignResult, err := presignClient.PresignPutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(client.Config.Endpoint),
-		Key:    aws.String(path),
+		Key:    aws.String(client.ToRelativePath(path)),
 	})
 	return presignResult.URL, err
 }
 
-// GetEndpoint() string
+// GetEndpoint string
 func (client Client) GetEndpoint() string {
 	if client.Config.Bucket == "" {
-		return fmt.Sprintf("https://%s.r2.cloudflarestorage.com", client.Config.AccessID)
+		endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", client.Config.AccountId)
+		client.Config.Bucket = endpoint
 	}
 
 	return client.Config.Endpoint
@@ -189,18 +192,11 @@ var urlRegexp = regexp.MustCompile(`(https?:)?//((\w+).)+(\w+)/`)
 
 // ToRelativePath process path to relative path
 func (client Client) ToRelativePath(urlPath string) string {
-	//if urlRegexp.MatchString(urlPath) {
-	//	if u, err := url.Parse(urlPath); err == nil {
-	//		if client.Config.S3ForcePathStyle { // First part of path will be bucket name
-	//			return strings.TrimPrefix(u.Path, "/"+client.Config.Bucket)
-	//		}
-	//		return u.Path
-	//	}
-	//}
-	//
-	//if client.Config.S3ForcePathStyle { // First part of path will be bucket name
-	//	return "/" + strings.TrimPrefix(urlPath, "/"+client.Config.Bucket+"/")
-	//}
-	//return "/" + strings.TrimPrefix(urlPath, "/")
-	return urlPath
+	if urlRegexp.MatchString(urlPath) {
+		if u, err := url.Parse(urlPath); err == nil {
+			return "/" + strings.TrimPrefix(u.Path, "/")
+		}
+	}
+
+	return "/" + strings.TrimPrefix(urlPath, "/")
 }
