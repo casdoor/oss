@@ -38,14 +38,11 @@ type Config struct {
 // New init cloudflare r2 store
 func New(config *Config) *Client {
 
-	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", config.AccountId)
-	config.Endpoint = endpoint
-
 	client := &Client{Config: config}
 
 	r2Resolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
-			URL: endpoint,
+			URL: config.Endpoint,
 		}, nil
 	})
 
@@ -127,6 +124,7 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 }
 
 // Delete file with path
+// Deprecated: Feature Not Implemented; https://developers.cloudflare.com/r2/api/s3/api/
 func (client Client) Delete(path string) error {
 	params := &s3.DeleteObjectInput{
 		Bucket: aws.String(client.Config.Bucket),
@@ -169,13 +167,9 @@ func (client Client) List(path string) ([]*oss.Object, error) {
 }
 
 // GetURL Public Accessible URL (useful if current file saved privately)
+// Deprecated: Feature Not Implemented; https://developers.cloudflare.com/r2/api/s3/api/
 func (client Client) GetURL(path string) (string, error) {
-	presignClient := s3.NewPresignClient(client.R2)
-	presignResult, err := presignClient.PresignPutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(client.Config.Endpoint),
-		Key:    aws.String(client.ToRelativePath(path)),
-	})
-	return presignResult.URL, err
+	return "/" + client.ToRelativePath(path), nil
 }
 
 // GetEndpoint string
@@ -194,9 +188,9 @@ var urlRegexp = regexp.MustCompile(`(https?:)?//((\w+).)+(\w+)/`)
 func (client Client) ToRelativePath(urlPath string) string {
 	if urlRegexp.MatchString(urlPath) {
 		if u, err := url.Parse(urlPath); err == nil {
-			return "/" + strings.TrimPrefix(u.Path, "/")
+			return strings.TrimPrefix(u.Path, "/")
 		}
 	}
 
-	return "/" + strings.TrimPrefix(urlPath, "/")
+	return strings.TrimPrefix(urlPath, "/")
 }
