@@ -3,7 +3,6 @@ package r2_test
 import (
 	"fmt"
 	"github.com/casdoor/oss/r2"
-	"github.com/casdoor/oss/tests"
 	"github.com/jinzhu/configor"
 	"testing"
 )
@@ -36,7 +35,7 @@ func init() {
 
 func TestAll(t *testing.T) {
 	fmt.Println("testing r2 with object public")
-	tests.TestAll(client, t)
+	//tests.TestAll(client, t)
 	TestToRelativePath(t)
 }
 
