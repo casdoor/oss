@@ -37,15 +37,16 @@ func init() {
 func TestAll(t *testing.T) {
 	fmt.Println("testing r2 with object public")
 	tests.TestAll(client, t)
+	TestToRelativePath(t)
 }
 
 func TestToRelativePath(t *testing.T) {
 	urlMap := map[string]string{
-		"https://mybucket.s3.amazonaws.com/myobject.ext": "/myobject.ext",
-		"https://qor-example.com/myobject.ext":           "/myobject.ext",
-		"//mybucket.s3.amazonaws.com/myobject.ext":       "/myobject.ext",
-		"http://mybucket.s3.amazonaws.com/myobject.ext":  "/myobject.ext",
-		"myobject.ext": "/myobject.ext",
+		"https://mybucket.s3.amazonaws.com/myobject.ext": "myobject.ext",
+		"https://qor-example.com/myobject.ext":           "myobject.ext",
+		"//mybucket.s3.amazonaws.com/myobject.ext":       "myobject.ext",
+		"http://mybucket.s3.amazonaws.com/myobject.ext":  "myobject.ext",
+		"myobject.ext": "myobject.ext",
 	}
 
 	for url, path := range urlMap {
