@@ -16,7 +16,6 @@ package googlecloud
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"os"
@@ -32,54 +31,21 @@ import (
 
 // Client Google Cloud Storage
 type Client struct {
-	*storage.BucketHandle
-	Config *Config
+	Config       *Config
+	BucketHandle *storage.BucketHandle
 }
 
 // Config Google Cloud Storage client config
 type Config struct {
-	AccessID     string
-	AccessKey    string
-	Bucket       string
-	StorageClass string
-	Endpoint     string
+	ServiceAccountJson string
+	Bucket             string
+	Endpoint           string
 }
 
-type Credentials struct {
-	Web Web `json:"web"`
-}
-
-type Web struct {
-	ClientId                string   `json:"client_id"`
-	AuthUri                 string   `json:"auth_uri"`
-	TokenUri                string   `json:"token_uri"`
-	AuthProviderX509CertUrl string   `json:"auth_provider_x509_cert_url"`
-	ClientSecret            string   `json:"client_secret"`
-	RedirectUris            []string `json:"redirect_uris"`
-	JavascriptOrigins       []string `json:"javascript_origins"`
-}
-
-// New initialize Google Cloud Storage
+// New initializes Google Cloud Storage
 func New(config *Config) (*Client, error) {
 	ctx := context.Background()
-	client := &Client{Config: config}
-	web := Web{
-		ClientId:                config.AccessID,
-		AuthUri:                 "https://accounts.google.com/o/oauth2/auth",
-		TokenUri:                "https://oauth2.googleapis.com/token",
-		AuthProviderX509CertUrl: "https://www.googleapis.com/oauth2/v1/certs",
-		ClientSecret:            config.AccessKey,
-		RedirectUris:            []string{"https://www.googleapis.com/auth/cloud-platform"},
-		JavascriptOrigins:       []string{"http://localhost", "https://www.googleapis.com"},
-	}
-	cred := Credentials{Web: web}
-
-	credentialsData, err := json.Marshal(cred)
-	if err != nil {
-		return nil, err
-	}
-
-	credentials, err := google.CredentialsFromJSON(context.Background(), credentialsData, "https://www.googleapis.com/auth/cloud-platform")
+	credentials, err := google.CredentialsFromJSON(ctx, []byte(config.ServiceAccountJson), "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
 		return nil, err
 	}
@@ -89,11 +55,14 @@ func New(config *Config) (*Client, error) {
 		return nil, err
 	}
 
-	client.BucketHandle = storageClient.Bucket(config.Bucket)
+	client := &Client{
+		Config:       config,
+		BucketHandle: storageClient.Bucket(config.Bucket),
+	}
 	return client, nil
 }
 
-// Get receive file with given path
+// Get receives file with given path
 func (client Client) Get(path string) (file *os.File, err error) {
 	readCloser, err := client.GetStream(path)
 	if err != nil {
@@ -119,7 +88,7 @@ func (client Client) Get(path string) (file *os.File, err error) {
 	return file, nil
 }
 
-// GetStream get file as stream
+// GetStream gets file as stream
 func (client Client) GetStream(path string) (io.ReadCloser, error) {
 	ctx := context.Background()
 	_, err := client.BucketHandle.Object(path).Attrs(ctx)
@@ -130,14 +99,11 @@ func (client Client) GetStream(path string) (io.ReadCloser, error) {
 	return client.BucketHandle.Object(path).NewReader(ctx)
 }
 
-// Put store a reader into given path
+// Put stores a reader into given path
 func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) {
 	ctx := context.Background()
 
 	wc := client.BucketHandle.Object(urlPath).NewWriter(ctx)
-	if client.Config.StorageClass != "" {
-		wc.ObjectAttrs.StorageClass = client.Config.StorageClass
-	}
 
 	_, err := io.Copy(wc, reader)
 	if err != nil {
@@ -163,13 +129,13 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 	return res, nil
 }
 
-// Delete delete file
+// Delete deletes file
 func (client Client) Delete(path string) error {
 	ctx := context.Background()
 	return client.BucketHandle.Object(path).Delete(ctx)
 }
 
-// List list all objects under current path
+// List lists all objects under current path
 func (client Client) List(path string) ([]*oss.Object, error) {
 	var objects []*oss.Object
 	ctx := context.Background()
@@ -202,7 +168,10 @@ func (client Client) GetURL(path string) (url string, err error) {
 }
 
 func (client Client) GetEndpoint() string {
-	return client.Config.Endpoint
+	if client.Config.Endpoint != "" {
+		return client.Config.Endpoint
+	}
+	return "https://storage.googleapis.com"
 }
 
 func (client Client) ToRelativePath(urlPath string) string {

@@ -24,12 +24,27 @@ import (
 )
 
 func getClient() *googlecloud.Client {
-	client, err := googlecloud.New(&googlecloud.Config{
-		AccessID:  "xxx",
-		AccessKey: "-----BEGIN PRIVATE KEY-----xxx\\n-----END PRIVATE KEY-----\\n",
-		Bucket:    "casdoor",
-		Endpoint:  "https://storage.googleapis.com",
-	})
+	serviceAccountJson := `{
+  "type": "service_account",
+  "project_id": "casbin",
+  "private_key_id": "xxx",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nxxx\n-----END PRIVATE KEY-----\n",
+  "client_email": "casdoor-service-account@casbin.iam.gserviceaccount.com",
+  "client_id": "10336152244758146xxx",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/casdoor-service-account%40casbin.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}`
+
+	config := &googlecloud.Config{
+		ServiceAccountJson: serviceAccountJson,
+		Bucket:             "casdoor",
+		Endpoint:           "",
+	}
+
+	client, err := googlecloud.New(config)
 	if err != nil {
 		panic(err)
 	}
@@ -52,15 +67,28 @@ func TestClientPut(t *testing.T) {
 
 func TestClientDelete(t *testing.T) {
 	client := getClient()
-	fmt.Println(client.Delete("123.txt"))
+	err := client.Delete("123.txt")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestClientList(t *testing.T) {
 	client := getClient()
-	fmt.Println(client.List("/"))
+	objects, err := client.List("/")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(objects)
 }
 
 func TestClientGet(t *testing.T) {
 	client := getClient()
-	fmt.Println(client.Get("/"))
+	f, err := client.Get("/")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(f)
 }
