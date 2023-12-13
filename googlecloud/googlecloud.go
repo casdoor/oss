@@ -15,19 +15,19 @@
 package googlecloud
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
 	"encoding/json"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"cloud.google.com/go/storage"
 	"github.com/casdoor/oss"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 // Client Google Cloud Storage
@@ -61,13 +61,8 @@ type Web struct {
 
 // New initialize Google Cloud Storage
 func New(config *Config) (*Client, error) {
-	var (
-		err    error
-		client = &Client{Config: config}
-	)
-
 	ctx := context.Background()
-
+	client := &Client{Config: config}
 	web := Web{
 		ClientId:                config.AccessID,
 		AuthUri:                 "https://accounts.google.com/o/oauth2/auth",
@@ -77,41 +72,51 @@ func New(config *Config) (*Client, error) {
 		RedirectUris:            []string{"https://www.googleapis.com/auth/cloud-platform"},
 		JavascriptOrigins:       []string{"http://localhost", "https://www.googleapis.com"},
 	}
-
 	cred := Credentials{Web: web}
 
-	credentialsData, _ := json.Marshal(cred)
+	credentialsData, err := json.Marshal(cred)
+	if err != nil {
+		return nil, err
+	}
 
 	credentials, err := google.CredentialsFromJSON(context.Background(), credentialsData, "https://www.googleapis.com/auth/cloud-platform")
-
 	if err != nil {
-		log.Fatalf("Failed to get credentials: %v", err)
+		return nil, err
 	}
 
 	storageClient, err := storage.NewClient(ctx, option.WithCredentials(credentials))
-
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		return nil, err
 	}
 
 	client.BucketHandle = storageClient.Bucket(config.Bucket)
-
 	return client, nil
 }
 
 // Get receive file with given path
 func (client Client) Get(path string) (file *os.File, err error) {
 	readCloser, err := client.GetStream(path)
+	if err != nil {
+		return nil, err
+	}
+	defer readCloser.Close()
 
-	if err == nil {
-		if file, err = ioutil.TempFile("/tmp", "googlecloud"); err == nil {
-			defer readCloser.Close()
-			_, err = io.Copy(file, readCloser)
-			file.Seek(0, 0)
-		}
+	file, err = ioutil.TempFile("/tmp", "googlecloud")
+	if err != nil {
+		return nil, err
 	}
 
-	return file, err
+	_, err = io.Copy(file, readCloser)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 // GetStream get file as stream
@@ -133,10 +138,14 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 	if client.Config.StorageClass != "" {
 		wc.ObjectAttrs.StorageClass = client.Config.StorageClass
 	}
-	if _, err := io.Copy(wc, reader); err != nil {
+
+	_, err := io.Copy(wc, reader)
+	if err != nil {
 		return nil, err
 	}
-	if err := wc.Close(); err != nil {
+
+	err = wc.Close()
+	if err != nil {
 		return nil, err
 	}
 
@@ -145,12 +154,13 @@ func (client Client) Put(urlPath string, reader io.Reader) (*oss.Object, error) 
 		return nil, err
 	}
 
-	return &oss.Object{
+	res := &oss.Object{
 		Path:             urlPath,
 		Name:             filepath.Base(urlPath),
 		LastModified:     &attrs.Updated,
 		StorageInterface: client,
-	}, nil
+	}
+	return res, nil
 }
 
 // Delete delete file
@@ -162,8 +172,8 @@ func (client Client) Delete(path string) error {
 // List list all objects under current path
 func (client Client) List(path string) ([]*oss.Object, error) {
 	var objects []*oss.Object
-
 	ctx := context.Background()
+
 	iter := client.BucketHandle.Objects(ctx, &storage.Query{Prefix: path})
 	for {
 		objAttrs, err := iter.Next()

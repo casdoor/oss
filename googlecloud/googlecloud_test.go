@@ -17,43 +17,50 @@ package googlecloud_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/casdoor/oss/googlecloud"
 	"io/ioutil"
 	"testing"
+
+	"github.com/casdoor/oss/googlecloud"
 )
 
-var client *googlecloud.Client
-
-func TestInit(t *testing.T) {
-	client, _ = googlecloud.New(&googlecloud.Config{
-		AccessID:  "",
-		AccessKey: "",
-		Bucket:    "",
-		Endpoint:  "",
+func getClient() *googlecloud.Client {
+	client, err := googlecloud.New(&googlecloud.Config{
+		AccessID:  "xxx",
+		AccessKey: "-----BEGIN PRIVATE KEY-----xxx\\n-----END PRIVATE KEY-----\\n",
+		Bucket:    "casdoor",
+		Endpoint:  "https://storage.googleapis.com",
 	})
+	if err != nil {
+		panic(err)
+	}
 
+	return client
 }
 
 func TestClientPut(t *testing.T) {
-	f, err := ioutil.ReadFile("D:\\1.txt")
+	f, err := ioutil.ReadFile("E:/123.txt")
 	if err != nil {
-		t.Error(err)
-		return
+		panic(err)
 	}
-	_, err = client.Put("test.txt", bytes.NewReader(f))
+
+	client := getClient()
+	_, err = client.Put("123.txt", bytes.NewReader(f))
 	if err != nil {
-		return
+		panic(err)
 	}
 }
 
 func TestClientDelete(t *testing.T) {
-	fmt.Println(client.Delete("test.png"))
+	client := getClient()
+	fmt.Println(client.Delete("123.txt"))
 }
 
 func TestClientList(t *testing.T) {
+	client := getClient()
 	fmt.Println(client.List("/"))
 }
 
 func TestClientGet(t *testing.T) {
+	client := getClient()
 	fmt.Println(client.Get("/"))
 }
