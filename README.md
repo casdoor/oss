@@ -20,10 +20,8 @@ Casdoor OSS aims to provide a common interface to operate files with any kinds o
 
 ## Installation
 
-Use `go get` to install：
-
 ```
-go get github.com/casdoor/oss
+git clone https://github.com/casdoor/oss
 ```
 
 ## Create Client
