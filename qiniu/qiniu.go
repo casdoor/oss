@@ -63,7 +63,7 @@ var zonedata = map[string]*storage.Zone{
 	"beimei":  &storage.ZoneBeimei,
 }
 
-func New(config *Config) *Client {
+func New(config *Config) (*Client, error) {
 
 	client := &Client{Config: config, storageCfg: storage.Config{}}
 
@@ -72,16 +72,16 @@ func New(config *Config) *Client {
 	if z, ok := zonedata[strings.ToLower(config.Region)]; ok {
 		client.storageCfg.Zone = z
 	} else {
-		panic(fmt.Sprintf("Zone %s is invalid, only support huadong, huabei, huanan, beimei.", config.Region))
+		return nil, fmt.Errorf("Zone %s is invalid, only support huadong, huabei, huanan, beimei.", config.Region)
 	}
 	if len(config.Endpoint) == 0 {
-		panic("endpoint must be provided.")
+		return nil, fmt.Errorf("endpoint must be provided.")
 	}
 	client.storageCfg.UseHTTPS = config.UseHTTPS
 	client.storageCfg.UseCdnDomains = config.UseCdnDomains
 	client.bucketManager = storage.NewBucketManager(client.mac, &client.storageCfg)
 
-	return client
+	return client, nil
 }
 
 func (client Client) SetPutPolicy(putPolicy *storage.PutPolicy) {

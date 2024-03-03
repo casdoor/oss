@@ -45,14 +45,19 @@ func init() {
 		return
 	}
 
-	client = qiniu.New(&qiniu.Config{
+	var err error
+	client, err = qiniu.New(&qiniu.Config{
 		AccessID:  config.Public.AccessID,
 		AccessKey: config.Public.AccessKey,
 		Region:    config.Public.Region,
 		Bucket:    config.Public.Bucket,
 		Endpoint:  config.Public.Endpoint,
 	})
-	privateClient = qiniu.New(&qiniu.Config{
+	if err != nil {
+		panic(err)
+	}
+
+	privateClient, err = qiniu.New(&qiniu.Config{
 		AccessID:   config.Private.AccessID,
 		AccessKey:  config.Private.AccessKey,
 		Region:     config.Private.Region,
@@ -60,6 +65,9 @@ func init() {
 		Endpoint:   config.Private.Endpoint,
 		PrivateURL: true,
 	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestAll(t *testing.T) {
