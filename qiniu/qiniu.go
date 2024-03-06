@@ -92,7 +92,7 @@ func (client Client) SetPutPolicy(putPolicy *storage.PutPolicy) {
 func (client Client) Get(path string) (file *os.File, err error) {
 	readCloser, err := client.GetStream(path)
 
-	if file, err = ioutil.TempFile("/tmp", "qiniu"); err == nil {
+	if file, err = ioutil.TempFile(os.TempDir(), "qiniu"); err == nil {
 		defer readCloser.Close()
 		_, err = io.Copy(file, readCloser)
 		file.Seek(0, 0)
