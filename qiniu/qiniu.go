@@ -77,6 +77,10 @@ func New(config *Config) (*Client, error) {
 	if len(config.Endpoint) == 0 {
 		return nil, fmt.Errorf("endpoint must be provided.")
 	}
+
+	if !strings.HasPrefix(config.Endpoint, "http://") && !strings.HasPrefix(config.Endpoint, "https://") {
+		return nil, fmt.Errorf("endpoint must start with http:// or https://")
+	}
 	client.storageCfg.UseHTTPS = config.UseHTTPS
 	client.storageCfg.UseCdnDomains = config.UseCdnDomains
 	client.bucketManager = storage.NewBucketManager(client.mac, &client.storageCfg)
@@ -92,7 +96,7 @@ func (client Client) SetPutPolicy(putPolicy *storage.PutPolicy) {
 func (client Client) Get(path string) (file *os.File, err error) {
 	readCloser, err := client.GetStream(path)
 
-	if file, err = ioutil.TempFile("/tmp", "qiniu"); err == nil {
+	if file, err = ioutil.TempFile(os.TempDir(), "qiniu"); err == nil {
 		defer readCloser.Close()
 		_, err = io.Copy(file, readCloser)
 		file.Seek(0, 0)
