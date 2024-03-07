@@ -77,7 +77,7 @@ func New(config *Config) (*Client, error) {
 	if len(config.Endpoint) == 0 {
 		return nil, fmt.Errorf("endpoint must be provided.")
 	}
-	// 检查Endpoint是否以http://或https://开头
+
 	if !strings.HasPrefix(config.Endpoint, "http://") && !strings.HasPrefix(config.Endpoint, "https://") {
 		return nil, fmt.Errorf("endpoint must start with http:// or https://")
 	}
