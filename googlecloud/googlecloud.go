@@ -23,11 +23,10 @@ import (
 	"strings"
 
 	"cloud.google.com/go/storage"
+	"github.com/casdoor/oss"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-
-	"github.com/casdoor/oss"
 )
 
 // Client Google Cloud Storage
