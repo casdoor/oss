@@ -23,10 +23,11 @@ import (
 	"strings"
 
 	"cloud.google.com/go/storage"
-	"github.com/casdoor/oss"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+
+	"github.com/casdoor/oss"
 )
 
 // Client Google Cloud Storage
@@ -44,8 +45,19 @@ type Config struct {
 
 // New initializes Google Cloud Storage
 func New(config *Config) (*Client, error) {
-	ctx := context.Background()
-	credentials, err := google.CredentialsFromJSON(ctx, []byte(config.ServiceAccountJson), "https://www.googleapis.com/auth/cloud-platform")
+	var (
+		ctx   = context.Background()
+		scope = "https://www.googleapis.com/auth/cloud-platform"
+
+		credentials *google.Credentials
+		err         error
+	)
+
+	if config.ServiceAccountJson != "" {
+		credentials, err = google.CredentialsFromJSON(ctx, []byte(config.ServiceAccountJson), scope)
+	} else {
+		credentials, err = google.FindDefaultCredentials(ctx, scope)
+	}
 	if err != nil {
 		return nil, err
 	}
