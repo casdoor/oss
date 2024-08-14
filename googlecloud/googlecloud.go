@@ -44,8 +44,19 @@ type Config struct {
 
 // New initializes Google Cloud Storage
 func New(config *Config) (*Client, error) {
-	ctx := context.Background()
-	credentials, err := google.CredentialsFromJSON(ctx, []byte(config.ServiceAccountJson), "https://www.googleapis.com/auth/cloud-platform")
+	var (
+		ctx   = context.Background()
+		scope = "https://www.googleapis.com/auth/cloud-platform"
+
+		credentials *google.Credentials
+		err         error
+	)
+
+	if config.ServiceAccountJson != "" {
+		credentials, err = google.CredentialsFromJSON(ctx, []byte(config.ServiceAccountJson), scope)
+	} else {
+		credentials, err = google.FindDefaultCredentials(ctx, scope)
+	}
 	if err != nil {
 		return nil, err
 	}
