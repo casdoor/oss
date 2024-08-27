@@ -132,11 +132,11 @@ func (client Client) Put(urlPath string, reader io.Reader) (r *oss.Object, err e
 
 	//urlPath = client.transUrl(urlPath)
 
-	_, name, err := client.UploadResource("casdoor-oss", "", "", client.transUrl(urlPath), buffer)
+	fileUrl, name, err := client.UploadResource("casdoor-oss", "", "", client.transUrl(urlPath), buffer)
 
 	now := time.Now()
 	return &oss.Object{
-		Path:             name,
+		Path:             fileUrl,
 		Name:             name,
 		LastModified:     &now,
 		StorageInterface: client,
