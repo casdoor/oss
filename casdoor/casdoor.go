@@ -16,8 +16,6 @@ package casdoor
 
 import (
 	"fmt"
-	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
-	"github.com/casdoor/oss"
 	"io"
 	"net/http"
 	"net/url"
@@ -25,6 +23,9 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"github.com/casdoor/oss"
 )
 
 type Client struct {

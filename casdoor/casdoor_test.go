@@ -1,9 +1,10 @@
 package casdoor_test
 
 import (
+	"testing"
+
 	"github.com/casdoor/oss/casdoor"
 	"github.com/casdoor/oss/tests"
-	"testing"
 )
 
 var client *casdoor.Client
