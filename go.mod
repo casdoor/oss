@@ -7,6 +7,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible
 	github.com/aws/aws-sdk-go v1.44.4
+	github.com/casdoor/casdoor-go-sdk v0.50.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/qiniu/go-sdk/v7 v7.12.1
 	golang.org/x/oauth2 v0.13.0
@@ -21,11 +22,11 @@ require (
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
