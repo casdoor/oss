@@ -63,8 +63,8 @@ Here's an example of how to use [QOR OSS](https://github.com/qor/oss) with S3. A
 
 ```go
 import (
-  "github.com/oss/filesystem"
-  "github.com/oss/s3"
+  "github.com/casdoor/oss/filesystem"
+  "github.com/casdoor/oss/s3"
   awss3 "github.com/aws/aws-sdk-go/s3"
 )
 
